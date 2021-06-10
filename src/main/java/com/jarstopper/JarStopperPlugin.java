@@ -3,22 +3,17 @@ package com.jarstopper;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.ChatMessageType;
-import net.runelite.api.Client;
-import net.runelite.api.GameState;
+import net.runelite.api.*;
 import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
-import net.runelite.api.MenuEntry;
 import net.runelite.api.events.ClientTick;
 import net.runelite.client.util.Text;
-import net.runelite.api.ItemContainer;
 import net.runelite.api.events.ItemContainerChanged;
-import net.runelite.api.Item;
-import net.runelite.api.ItemComposition;
 import net.runelite.client.game.ItemManager;
+import net.runelite.client.input.MouseManager;
 
 @Slf4j
 @PluginDescriptor(
@@ -31,6 +26,8 @@ public class JarStopperPlugin extends Plugin
 	private boolean hasMedium;
 	private boolean hasHard;
 	private boolean hasElite;
+	private JarStopperMouseListener mouseListener;
+	private int testCounter = 0;
 
 	@Inject
 	private Client client;
@@ -41,10 +38,16 @@ public class JarStopperPlugin extends Plugin
 	@Inject
 	private ItemManager itemManager;
 
+	@Inject
+	private MouseManager mouseManager;
+
 	@Override
 	protected void startUp() throws Exception
 	{
 		log.info("Example started!");
+
+		mouseListener = new JarStopperMouseListener(this);
+		mouseManager.registerMouseListener(mouseListener);
 	}
 
 	@Override
@@ -110,9 +113,8 @@ public class JarStopperPlugin extends Plugin
 		}
 	}
 
-	@Subscribe
-	public void onItemContainerChanged(ItemContainerChanged change) {
-		Item[] items = change.getItemContainer().getItems();
+	public void checkInventory() {
+		Item[] items = client.getItemContainer(InventoryID.INVENTORY).getItems();
 		hasBeginner = false;
 		hasEasy = false;
 		hasMedium = false;
@@ -134,9 +136,37 @@ public class JarStopperPlugin extends Plugin
 				hasElite = true;
 			}
 		}
-
-		//client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", hasBeginner + " " + hasEasy + " " + hasMedium + " " + hasHard + " " + hasElite, null);
+//		testCounter ++;
+//		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "clicked mouse: " + testCounter, null);
 	}
+
+//	@Subscribe
+//	public void onItemContainerChanged(ItemContainerChanged change) {
+//		Item[] items = change.getItemContainer().getItems();
+//		hasBeginner = false;
+//		hasEasy = false;
+//		hasMedium = false;
+//		hasHard = false;
+//		hasElite = false;
+//
+//		for (int i = 0; i < items.length; i ++) {
+//			String itemName = itemManager.getItemComposition(items[i].getId()).getName();
+//
+//			if (itemName.equals("Clue scroll (beginner)")) {
+//				hasBeginner = true;
+//			} else if (itemName.equals("Clue scroll (easy)")) {
+//				hasEasy = true;
+//			} else if (itemName.equals("Clue scroll (medium)")) {
+//				hasMedium = true;
+//			} else if (itemName.equals("Clue scroll (hard)")) {
+//				hasHard = true;
+//			} else if (itemName.equals("Clue scroll (elite)")) {
+//				hasElite = true;
+//			}
+//		}
+//
+//		//client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", hasBeginner + " " + hasEasy + " " + hasMedium + " " + hasHard + " " + hasElite, null);
+//	}
 
 	@Provides
 	JarStopperConfig provideConfig(ConfigManager configManager)
