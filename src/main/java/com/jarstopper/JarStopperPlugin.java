@@ -4,14 +4,12 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.api.events.ClientTick;
 import net.runelite.client.util.Text;
-import net.runelite.api.events.ItemContainerChanged;
 import net.runelite.client.game.ItemManager;
 import net.runelite.client.input.MouseManager;
 
@@ -56,15 +54,6 @@ public class JarStopperPlugin extends Plugin
 		log.info("Example stopped!");
 	}
 
-//	@Subscribe
-//	public void onGameStateChanged(GameStateChanged gameStateChanged)
-//	{
-//		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
-//		{
-//			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.greeting(), null);
-//		}
-//	}
-
 	@Subscribe
 	public void onClientTick(ClientTick clientTick) {
 		if (client.getGameState() != GameState.LOGGED_IN || client.isMenuOpen())// || client.isKeyPressed(KeyCode.KC_SHIFT))
@@ -76,6 +65,7 @@ public class JarStopperPlugin extends Plugin
 		if (menuEntries.length <= 1) {
 			return;
 		}
+		checkInventory();
 
 		String sourceName = Text.removeTags(menuEntries[1].getTarget());
 		if (config.swapBabyJars() && (hasBeginner || hasEasy) && sourceName.equals("Baby impling jar") ||
@@ -136,37 +126,7 @@ public class JarStopperPlugin extends Plugin
 				hasElite = true;
 			}
 		}
-//		testCounter ++;
-//		client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "clicked mouse: " + testCounter, null);
 	}
-
-//	@Subscribe
-//	public void onItemContainerChanged(ItemContainerChanged change) {
-//		Item[] items = change.getItemContainer().getItems();
-//		hasBeginner = false;
-//		hasEasy = false;
-//		hasMedium = false;
-//		hasHard = false;
-//		hasElite = false;
-//
-//		for (int i = 0; i < items.length; i ++) {
-//			String itemName = itemManager.getItemComposition(items[i].getId()).getName();
-//
-//			if (itemName.equals("Clue scroll (beginner)")) {
-//				hasBeginner = true;
-//			} else if (itemName.equals("Clue scroll (easy)")) {
-//				hasEasy = true;
-//			} else if (itemName.equals("Clue scroll (medium)")) {
-//				hasMedium = true;
-//			} else if (itemName.equals("Clue scroll (hard)")) {
-//				hasHard = true;
-//			} else if (itemName.equals("Clue scroll (elite)")) {
-//				hasElite = true;
-//			}
-//		}
-//
-//		//client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", hasBeginner + " " + hasEasy + " " + hasMedium + " " + hasHard + " " + hasElite, null);
-//	}
 
 	@Provides
 	JarStopperConfig provideConfig(ConfigManager configManager)
