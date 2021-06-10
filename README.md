@@ -4,3 +4,5 @@
 
 ##How It Works
 Stops you from opening impling jars once you get a clue. Spam clicking might lead to 1 or 2 extra opened jars due to server latency. 
+
+
